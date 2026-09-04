@@ -2,6 +2,8 @@
 
 Vue 3 + Vite + TypeScript. 화면 3개: **입력 폼 → 결과 화면 → AI 설명 패널**. 상태 관리 라이브러리 없음, 차트는 Chart.js.
 
+작업 브랜치는 **`develop`** (ai-service와 같은 방침). `main`은 초기 커밋, 제출 직전 머지.
+
 ## 실행
 
 ```bash
@@ -47,6 +49,7 @@ src/
 
 ## 남은 것
 
+- **아직 실제로 못 본 것** (목 데이터가 성공 응답뿐이라): 서버 `errors[]`가 폼 필드에 붙는 화면 · UNAVAILABLE 배너와 재시도 · 부족 케이스(`shortfall > 0`) 문구 · 모바일 폭 · 새로고침 시 결과 유실(`public_id` 재조회 미구현)
 - Stitch 디자인 → `src/style.css` 색·간격 반영
 - Spring 연동 (9/5 합숙): `VITE_USE_MOCK=0` 후 `/plans` → `/explanation` 왕복
-- (스트레치) 결과 화면 하단 "한 가지 물어보기" 단일 질문 — ai-service `/rag/ask` 합의 후
+- (스트레치) 결과 화면 하단 "한 가지 물어보기" 단일 질문 — ai-service `/rag/ask` 합의 후. 대화형 채팅·로그인·사용자 프로필은 MVP 밖(9/2 회의·KAN-4 제외 범위)
