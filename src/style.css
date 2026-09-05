@@ -22,7 +22,8 @@ button.link { border: none; background: none; color: var(--accent); padding: 4px
 .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
 .banner { padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 14px; }
 .banner.bad { background: var(--bad-bg); color: var(--bad); } .banner.warn { background: var(--warn-bg); color: var(--warn); } .banner.info { background: var(--accent-bg); color: var(--accent); }
-table { width: 100%; border-collapse: collapse; font-size: 14px; } th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: right; } th:first-child, td:first-child { text-align: left; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; } th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; } th:first-child, td:first-child { text-align: left; }
 th { color: var(--muted); font-weight: 600; font-size: 12px; } tr.focus td { background: var(--accent-bg); font-weight: 600; }
 .kpi { display: flex; flex-direction: column; gap: 4px; } .kpi .v { font-size: 22px; font-weight: 700; } .kpi .k { font-size: 12px; color: var(--muted); }
 .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; background: var(--accent-bg); color: var(--accent); }
