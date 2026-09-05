@@ -64,6 +64,7 @@ const foreign = computed(() => (calc.value.meta.assets_used ?? []).some((a) => a
   <div class="card">
     <h2>리밸런싱 주기 비교</h2>
     <div v-if="degenerate" class="banner info">리밸런싱할 상대 자산이 없어(투자 자산 1개 또는 투자 배분 0%) 주기를 바꿔도 결과가 같습니다.</div>
+    <div class="table-wrap">
     <table>
       <thead><tr><th>주기</th><th>만기 총자산</th><th>{{ gap.shortfall > 0 ? '부족' : '초과' }}액</th><th>누적 거래비용</th><th>최대 낙폭</th><th>연환산 변동성</th><th>최대 비중 이탈</th></tr></thead>
       <tbody>
@@ -74,6 +75,7 @@ const foreign = computed(() => (calc.value.meta.assets_used ?? []).some((a) => a
         </tr>
       </tbody>
     </table>
+    </div>
     <p class="muted small" style="margin-top:8px">비교 축은 비용·이탈·낙폭입니다. 어느 주기가 낫다고 판정하지 않습니다. 주기와 비용의 관계는 목표 기간·초기 자금·납입 형태에 따라 달라집니다.</p>
     <div style="margin-top:14px"><TrajectoryChart :calc="calc" :focus="focus" :goal="goal" /></div>
   </div>
