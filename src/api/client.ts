@@ -18,6 +18,8 @@ export type Period = 'M' | 'Q' | 'H'
 
 const BASE = (import.meta.env.VITE_API_BASE as string | undefined) ?? '/api/v1'
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === '1'
+/** 기본 비활성. RAG 배포가 준비된 환경에서만 명시적으로 true로 켠다. */
+const RAG_ENABLED = import.meta.env.VITE_ENABLE_RAG === 'true'
 
 /** 오류 봉투 {code, message, retryable, errors[]} 를 그대로 들고 다니는 예외. 폼은 errors[].field 로 매핑한다. */
 export class ApiError extends Error {
@@ -79,3 +81,4 @@ export const api = {
 }
 
 export const isMock = USE_MOCK
+export const isRagEnabled = RAG_ENABLED
