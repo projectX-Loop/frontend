@@ -17,9 +17,12 @@ watch(form, (v) => emit('update:modelValue', clone(v)), { deep: true })
 
 const universe = ref<UniverseResponse | null>(null)
 const samples = ref<SamplesResponse | null>(null)
-onMounted(async () => {
-  try { universe.value = await api.universe() } catch { /* 폼은 유니버스 없이도 그려진다 */ }
-  try { samples.value = await api.samples() } catch { /* 선택 기능 */ }
+const samplesState = ref<'loading' | 'ready' | 'error'>('loading')
+onMounted(() => {
+  void api.universe().then((response) => { universe.value = response }).catch(() => { /* 폼은 유니버스 없이도 그려진다 */ })
+  void api.samples()
+    .then((response) => { samples.value = response; samplesState.value = 'ready' })
+    .catch(() => { samplesState.value = 'error' })
 })
 
 /** 클라이언트 검증 — 서버(Kan-9 정적 검증)와 같은 코드·범위. 왕복 전에 잡는다. */
@@ -69,7 +72,9 @@ const periods: { v: Period; label: string; desc: string }[] = [
     <div class="card">
       <div class="topbar">
         <h2 style="margin:0">목표와 자금</h2>
-        <button type="button" class="link" @click="applySample" :disabled="!samples">예시 값 채우기{{ samples ? '' : ' (불러오는 중)' }}</button>
+        <button type="button" class="link" @click="applySample" :disabled="samplesState !== 'ready'">
+          {{ samplesState === 'ready' ? '예시 값 채우기' : samplesState === 'error' ? '예시 값을 불러오지 못했습니다' : '예시 값 불러오는 중' }}
+        </button>
       </div>
       <div class="grid2">
         <div class="field"><label>목표 금액 (원)</label><input type="number" v-model.number="form.goal.amount" min="1000000" max="10000000000" step="1000000" /><div class="err" v-if="err('goal.amount')">{{ err('goal.amount') }}</div></div>
@@ -107,7 +112,7 @@ const periods: { v: Period; label: string; desc: string }[] = [
       </div>
       <button type="button" @click="addAsset" :disabled="form.portfolio.assets.length >= 3">+ 자산 추가</button>
       <div class="err" v-if="err('portfolio.assets')">{{ err('portfolio.assets') }}</div>
-      <p class="muted small" v-if="universe">데이터 기준 {{ universe.snapshot.window.start }}~{{ universe.snapshot.window.end }} · 안전저축 연 {{ universe.snapshot.safe_rate_annual_pct.toFixed(2) }}%</p>
+      <p class="muted small" v-if="universe">데이터 기준 {{ universe.snapshot.window.start }}~{{ universe.snapshot.window.end }}</p>
     </div>
 
     <div class="card">

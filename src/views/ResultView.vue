@@ -13,6 +13,7 @@ const calc = computed(() => props.plan.calculation)
 const focus = computed<Period>(() => (props.plan.plan.inputs.rebalancing?.focus as Period) ?? 'Q')
 const goal = computed(() => props.plan.plan.inputs.goal.amount)
 const win = computed(() => calc.value.meta.window)
+const safeRate = computed(() => calc.value.meta.safe_rate_annual_pct)
 const periods: Period[] = ['M', 'Q', 'H']
 const pp = (p: Period) => calc.value.per_period[p]!
 const gap = computed(() => pp(focus.value).gap)
@@ -95,7 +96,7 @@ const foreign = computed(() => (calc.value.meta.assets_used ?? []).some((a) => a
     <p class="muted small" style="margin:0 0 6px">{{ calc.meta.data_basis }}</p>
     <p class="muted small" style="margin:0">
       자산: <span v-for="a in calc.meta.assets_used ?? []" :key="a.code">{{ a.display_name }}<template v-if="a.instrument"> ({{ a.instrument }})</template> · </span>
-      안전저축 연 {{ calc.meta.safe_rate_annual_pct?.toFixed(2) }}% · 데이터 버전 {{ calc.meta.data_version }}
+      <template v-if="safeRate != null">안전저축 연 {{ safeRate.toFixed(2) }}% · </template>데이터 버전 {{ calc.meta.data_version }}
       <template v-if="foreign"> · 해외 자산은 환노출(무헤지)</template>
       <template v-if="calc.meta.options?.account == null"> · 세금 미반영</template>
     </p>

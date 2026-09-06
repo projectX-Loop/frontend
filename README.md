@@ -47,10 +47,13 @@ CloudFront를 앞단에 추가하는 경우 `/api/*` behavior는 GET/HEAD/OPTION
 
 | 것 | 원본 | 여기 |
 |---|---|---|
-| API 타입 | `ai-service/docs/openapi/public-api.openapi.json` (KAN-4, 성종현) | `src/api/types.ts` — `npx openapi-typescript ../ai-service/docs/openapi/public-api.openapi.json -o src/api/types.ts` 로 재생성 |
-| 목 데이터 | `ai-service/docs/openapi/examples/*.json` 13개 | `src/mocks/` 사본. 계약이 바뀌면 다시 복사 |
+| 생성 API 타입 | 마지막으로 받은 OpenAPI 계약 | `src/api/types.ts` — 생성 파일이므로 직접 수정하지 않는다. 최신 원본이 제공되면 재생성한다. |
+| `/universe` 타입 | 백엔드 `UniverseResponse` 구현 | `src/api/client.ts` — OpenAPI 원본이 아직 옛 필드를 포함해 로컬 타입으로 유지한다. |
+| 목 데이터 | 현재 백엔드 계약 | `src/mocks/` — `snapshot` 식별·기간과 자산의 `code`·`display_name`·`instrument`·`tax_class`만 사용한다. |
 | 경로·상태 코드·화면 매핑 | 노션 「프론트-백엔드 계약 정리」 §1·§2·§4 (도윤) | `src/api/client.ts`, `src/views/ResultView.vue` |
 | 입력 검증 코드 이름 | Kan-9 §2 (`GOAL_AMOUNT_RANGE` …) | `src/views/InputForm.vue` — 서버와 같은 이름·범위 |
+
+`/universe`는 `assets[].group`과 `snapshot.safe_rate_annual_pct`를 반환하지 않는다. 안전 금리는 계산 결과의 `calculation.meta.safe_rate_annual_pct`에서만 표시한다.
 
 ## 프론트가 요구하는 공개 API
 

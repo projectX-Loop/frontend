@@ -11,7 +11,23 @@ export type PlanResponse = components['schemas']['PlanResponse']
 export type Calculation = components['schemas']['Calculation']
 export type ExplanationResponse = components['schemas']['ExplanationResponse']
 export type Explanation = components['schemas']['Explanation']
-export type UniverseResponse = components['schemas']['UniverseResponse']
+/**
+ * `/universe`는 백엔드의 현재 응답을 따른다. 생성 OpenAPI 원본이 아직
+ * `group`과 `snapshot.safe_rate_annual_pct`를 요구하므로, 갱신 전까지 로컬 타입으로 유지한다.
+ */
+export type UniverseResponse = {
+  snapshot: {
+    data_version: string
+    data_hash: string
+    window: { start: string; end: string; months: number }
+  }
+  assets: Array<{
+    code: string
+    display_name: string
+    instrument: string
+    tax_class: string
+  }>
+}
 export type SamplesResponse = components['schemas']['SamplesResponse']
 export type ErrorEnvelope = components['schemas']['ErrorEnvelope']
 export type Period = 'M' | 'Q' | 'H'
