@@ -22,6 +22,20 @@ npm run build                     # dist/ → nginx 가 정적 서빙 (도윤 �
 | 경로·상태 코드·화면 매핑 | 노션 「프론트-백엔드 계약 정리」 §1·§2·§4 (도윤) | `src/api/client.ts`, `src/views/ResultView.vue` |
 | 입력 검증 코드 이름 | Kan-9 §2 (`GOAL_AMOUNT_RANGE` …) | `src/views/InputForm.vue` — 서버와 같은 이름·범위 |
 
+## 프론트가 요구하는 공개 API
+
+기본 경로는 `/api/v1`이며, 개발 환경에서는 Vite가 `/api`를 Spring 서버로 프록시한다.
+
+| 메서드·경로 | 용도 | 프론트 사용 시점 |
+|---|---|---|
+| `GET /universe` | 선택 가능한 자산 목록과 데이터 기준 제공 | 입력 폼 로드 시 |
+| `GET /samples` | 대표 페르소나 입력 샘플 제공 | “예시 값 채우기” 선택 시 |
+| `POST /plans` | 입력 저장 및 월·분기·반기 리밸런싱 시뮬레이션 계산 | “시뮬레이션 계산” 버튼 시 |
+| `GET /plans/{public_id}` | 저장된 입력으로 재계산 | 새로고침·공유 링크 대응용 (현재 UI 흐름에는 미연결) |
+| `POST /plans/{public_id}/explanation` | 계산 결과 기반 AI 설명 생성 | 결과 화면 진입 후 별도 비동기 호출 |
+
+`POST /plans` 요청 본문은 `goal`, `funds`, `alloc`, `portfolio`, `rebalancing`으로 구성한다. 오류 응답은 모두 `ErrorEnvelope`(`code`, `message`, `retryable`, `errors[]`)을 사용하며, 입력 오류의 `errors[].field`는 폼 필드에 표시한다. AI 설명 API는 HTTP 200이어도 `status`(`OK`, `EXPLANATION_REJECTED`, `EXPLANATION_UNAVAILABLE`)로 성패를 판단한다.
+
 ## 구조
 
 ```
