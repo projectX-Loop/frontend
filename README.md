@@ -26,6 +26,8 @@ npm run build                     # dist/ → nginx 가 정적 서빙 (도윤 �
 
 기본 경로는 `/api/v1`이며, 개발 환경에서는 Vite가 `/api`를 Spring 서버로 프록시한다.
 
+요청·성공/오류 응답의 필드, 타입, nullable 여부와 상태 코드는 [공개 API 계약](docs/api-contract.md)에서 관리한다. 정식 계약 기준은 OpenAPI에서 생성한 `src/api/types.ts`다.
+
 | 메서드·경로 | 용도 | 프론트 사용 시점 |
 |---|---|---|
 | `GET /universe` | 선택 가능한 자산 목록과 데이터 기준 제공 | 입력 폼 로드 시 |
