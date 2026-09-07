@@ -8,6 +8,7 @@ import { api, ApiError, isMock, isRagEnabled, type PlanInputs, type PlanResponse
 import InputForm from './views/InputForm.vue'
 import ResultView from './views/ResultView.vue'
 import ExplanationPanel from './components/ExplanationPanel.vue'
+import ChatPanel from './components/ChatPanel.vue'
 
 const inputs = ref<PlanInputs>({
   goal: { amount: 50_000_000, horizon_months: 60 }, funds: { initial: 10_000_000, monthly: 600_000 },
@@ -100,5 +101,6 @@ onMounted(() => {
     <div class="actions" style="justify-content:flex-start;margin-bottom:12px"><button @click="back">← 조건 수정</button></div>
     <ResultView :plan="plan" />
     <ExplanationPanel v-if="isRagEnabled" :state="explState" :resp="expl" :focus="(plan.plan.inputs.rebalancing?.focus as Period) ?? 'Q'" @retry="explain" />
+    <ChatPanel v-if="isRagEnabled && explState === 'done'" :public-id="plan.plan.public_id" />
   </template>
 </template>
