@@ -81,6 +81,8 @@ src/
   views/InputForm.vue      Kan-9 8필드 · /universe 자산 선택 · /samples 예시 채우기 · 클라이언트 검증 · 서버 errors[] 필드 매핑
   views/ResultView.vue     목표와의 거리(gap.status·extension_status 분기) · 3주기 표(퇴화 시 1열) · 추이 차트 · 위험 · 데이터 기준(필수)
   components/ExplanationPanel.vue   status OK / REJECTED / UNAVAILABLE 3상태. 실패해도 결과 화면은 유지
+  components/ChatPanel.vue    AI 질문·답변 스레드(KAN-24) — plan당 스레드 하나(세션 목록 없음). api.ask() 사용
+  chat/store.ts                스레드 저장(localStorage, plan.public_id 스코프). 백엔드 연동 시 이 파일만 교체 예정
   components/TrajectoryChart.vue
   App.vue                  입력 → POST /plans → 결과, ?plan=<UUID> → GET /plans/{id} 복구
 ```
@@ -96,7 +98,7 @@ src/
 
 ## 남은 것
 
-- **실백엔드 확인 필요**: 서버 `errors[]`가 폼 필드에 붙는 화면 · 부족 케이스(`shortfall > 0`) 문구 · 모바일 폭 · `?plan=<UUID>` 새로고침 복구
+- ~~서버 `errors[]` 폼 필드 표시 · UNAVAILABLE 배너·재시도 · 부족 케이스(`shortfall > 0`) 문구 · 모바일 폭 · `?plan=<UUID>` 새로고침 복구~~ — 9/5 밤 mock 교체로 브라우저 실확인 완료, PR #2(9/6)로 `restorePlan()`/`?plan=<UUID>` 복구까지 실구현 완료. 모바일 폭에서 리밸런싱 비교 테이블이 페이지를 가로로 미는 버그 1건 발견·수정(`develop`·`feature/rag-ask` 둘 다 반영)
 - Stitch 디자인 → `src/style.css` 색·간격 반영
-- RAG는 `VITE_ENABLE_RAG=true`와 백엔드 준비 후 별도 배포
-- (스트레치) 결과 화면 하단 "한 가지 물어보기" 단일 질문 — ai-service `/rag/ask` 합의 후. 대화형 채팅·로그인·사용자 프로필은 MVP 밖(9/2 회의·KAN-4 제외 범위)
+- **RAG는 `VITE_ENABLE_RAG=true`와 백엔드 준비 후 별도 배포** — 백엔드(explanation)·ai-service(`/rag/answer`·`/rag/ask`) 양쪽 다 9/6 기준 준비 완료. 전환 시점은 팀 결정 대기(frontend issue #4)
+- **AI 질문·답변 스레드 + 멀티턴 — KAN-24** (`feature/rag-ask` 브랜치, 9/6 develop merge) — `ChatPanel.vue`: plan당 대화 스레드 하나(세션 목록·"새 대화"·전환 없음). **9/5 밤 ERD 갱신(도윤·성종현)으로 범위 축소** — 처음엔 좌측 세션 목록 사이드바로 만들었으나(9/5 도윤 구두 확인 "클로드 옆 채팅 목록처럼"), `agent_session`+`agent_message` 2테이블을 `plan_explanation` 1테이블로 통합하면서 세션 CRUD 자체가 없어짐 — plan_id로 바로 그룹핑하는 스레드 하나로 되돌림. 스레드는 `plan.public_id` 기준(로그인 없음), 지금은 `localStorage`(`src/chat/store.ts`)로 저장 — 백엔드 붙으면 이 파일 내부만 교체 예정. **9/6 결정으로 멀티턴 문맥은 서버(Spring)가 `plan_explanation`에서 재구성** — 프론트는 더 이상 `history`를 조립해 보내지 않고 `question`만 전송(`api.ask()` 시그니처 변경). `ChatPanel`은 `isRagEnabled`로도 게이트됨(App.vue). 목 데이터로 스레드 유지·새로고침 유지까지 브라우저 확인, 실서버 연동은 배포 시점 확인 예정. 로그인·사용자 프로필은 여전히 MVP 밖

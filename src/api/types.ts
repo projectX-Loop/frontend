@@ -198,6 +198,73 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/plans/{public_id}/questions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 단발 질문 (KAN-24, 9/5 도윤 구두 확인)
+         * @description 재계산 → analyze() 출력 + rebalancing.focus + goal.amount + question → ai-service POST /rag/ask (타임아웃 30초). 이력 없음 — 매 호출이 독립, 대화 저장 안 함.
+         *
+         *     ai-service 규약대로 **처리가 끝나면 항상 200**, 성패는 `status`. ai-service 불가·타임아웃만 502 ANSWER_UNAVAILABLE (retryable).
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description POST /plans 응답의 plan.public_id */
+                    public_id: string;
+                };
+                cookie?: never;
+            };
+            /** @description 자유 질문 텍스트 */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["QuestionRequest"];
+                };
+            };
+            responses: {
+                /** @description status 로 분기. OK 면 answer, 아니면 message */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["QuestionResponse"];
+                    };
+                };
+                /** @description PLAN_NOT_FOUND */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorEnvelope"];
+                    };
+                };
+                /** @description ai-service 불가·타임아웃 */
+                502: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorEnvelope"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/universe": {
         parameters: {
             query?: never;
@@ -416,7 +483,7 @@ export interface components {
         ErrorEnvelope: {
             /**
              * Code
-             * @description HTTP 층: VALIDATION_ERROR · UNSUPPORTED_FIELD · PLAN_NOT_FOUND · CALCULATION_FAILED · EXPLANATION_UNAVAILABLE · SNAPSHOT_MISMATCH. 데이터 의존 오류는 엔진 코드 그대로: INSUFFICIENT_HISTORY · ASSET_NOT_IN_CATALOG
+             * @description HTTP 층: VALIDATION_ERROR · UNSUPPORTED_FIELD · PLAN_NOT_FOUND · CALCULATION_FAILED · EXPLANATION_UNAVAILABLE · ANSWER_UNAVAILABLE · SNAPSHOT_MISMATCH. 데이터 의존 오류는 엔진 코드 그대로: INSUFFICIENT_HISTORY · ASSET_NOT_IN_CATALOG
              */
             code: string;
             /**
@@ -733,6 +800,56 @@ export interface components {
              */
             cons: components["schemas"]["Claim"][];
         };
+        /**
+         * QuestionHistoryItem
+         * @description 세션 내 이전 질문·답변 한 쌍. 서버는 저장하지 않으므로 호출부(Spring/프론트)가 들고 있다가 매번 동봉한다.
+         */
+        QuestionHistoryItem: {
+            /** Question */
+            question: string;
+            /** Answer */
+            answer: string;
+        };
+        /**
+         * QuestionRequest
+         * @description POST /plans/{public_id}/questions 요청 본문. 서버는 세션을 저장하지 않는다(대화 저장 안 함) —
+         *     멀티턴이 되려면 history에 이전 질문·답변을 그대로 실어 보낸다. 비어 있으면 단발 질문과 동일하게 동작.
+         */
+        QuestionRequest: {
+            /**
+             * Question
+             * @description 자유 질문 텍스트
+             */
+            question: string;
+            /**
+             * History
+             * @description 이 세션에서 지금까지의 질문·답변. 빈 배열이면 단발 질문(이전 대화 없음)과 동일
+             */
+            history?: components["schemas"]["QuestionHistoryItem"][];
+        };
+        /**
+         * QuestionResponse
+         * @description POST /plans/{public_id}/questions 200 본문. ExplanationResponse와 같은 모양(status로 분기).
+         *
+         *     ai-service POST /rag/ask 의 answer(schema.Claim) 그대로 노출. attempts·retrieved_refs·violations는
+         *     디버깅·저장용(agent_message, KAN-24)이라 브라우저에 주지 않는다 — ExplanationResponse와 동일한 원칙.
+         */
+        QuestionResponse: {
+            status: components["schemas"]["QuestionStatus"];
+            /** @description status=OK 일 때만 non-null */
+            answer: components["schemas"]["Claim"] | null;
+            /**
+             * Message
+             * @description status≠OK 일 때 답변 영역에 보여줄 문구
+             * @default null
+             */
+            message: string | null;
+        };
+        /**
+         * QuestionStatus
+         * @enum {string}
+         */
+        QuestionStatus: "OK" | "ANSWER_REJECTED" | "ANSWER_UNAVAILABLE";
         /** Rebalancing */
         Rebalancing: {
             /** @description 강조 주기 M/Q/H. 필수 — FOCUS_INVALID. 계산은 세 주기 전부, 화면·AI에서 강조 */
