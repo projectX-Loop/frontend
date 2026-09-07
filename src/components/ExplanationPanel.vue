@@ -2,6 +2,7 @@
 /**
  * AI 설명 패널 — POST /plans/{id}/explanation. 항상 200 + status.
  * 결과 화면은 이 패널 없이도 완성돼야 한다(PRD 수용기준 2). 여기서 실패해도 위 결과는 그대로.
+ * 질문답변(KAN-24)은 여기 없다 — ChatPanel.vue 로 분리(세션 목록이 생기면서 규모가 커짐).
  */
 import type { ExplanationResponse, Period } from '../api/client'
 import { PERIOD_LABEL } from '../format'

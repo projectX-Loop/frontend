@@ -11,6 +11,8 @@ export type PlanResponse = components['schemas']['PlanResponse']
 export type Calculation = components['schemas']['Calculation']
 export type ExplanationResponse = components['schemas']['ExplanationResponse']
 export type Explanation = components['schemas']['Explanation']
+export type QuestionResponse = components['schemas']['QuestionResponse']
+export type QuestionHistoryItem = components['schemas']['QuestionHistoryItem']
 /**
  * `/universe`는 백엔드의 현재 응답을 따른다. 생성 OpenAPI 원본이 아직
  * `group`과 `snapshot.safe_rate_annual_pct`를 요구하므로, 갱신 전까지 로컬 타입으로 유지한다.
@@ -94,6 +96,11 @@ export const api = {
   /** 항상 200 + status. 생성 20~60초 → 화면은 로딩 상태를 길게 보여줄 것 */
   explain: (publicId: string): Promise<ExplanationResponse> =>
     USE_MOCK ? mock('explanation.response.ok', 1500) : request('POST', `/plans/${publicId}/explanation`),
+
+  /** 질문답변(KAN-24, 멀티턴). 이전 대화 맥락은 서버가 plan_explanation에서 직접 재구성한다
+   * (9/6 결정, docs/plan-rag-design.md) — 클라이언트는 history를 안 보낸다. */
+  ask: (publicId: string, question: string): Promise<QuestionResponse> =>
+    USE_MOCK ? mock('questions.response.ok', 1200) : request('POST', `/plans/${publicId}/questions`, { question }),
 }
 
 export const isMock = USE_MOCK

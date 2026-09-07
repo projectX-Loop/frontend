@@ -34,3 +34,7 @@ ul.clean { margin: 0; padding-left: 18px; } ul.clean li { margin-bottom: 6px; li
 .skeleton { height: 14px; background: linear-gradient(90deg, #eee, #f7f7f7, #eee); background-size: 200% 100%; animation: sh 1.2s infinite; border-radius: 4px; margin: 8px 0; }
 @keyframes sh { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }
 .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+
+.chat-msg { margin-bottom: 14px; }
+.chat-q { font-weight: 600; margin: 0 0 4px; }
+.chat-a { margin: 0; line-height: 1.6; }
